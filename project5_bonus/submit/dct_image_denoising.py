@@ -3,7 +3,6 @@ from compute_stat import compute_stat
 from im2col import im2col
 from col2im import col2im
 from batch_thresholding import batch_thresholding
-import matplotlib.pyplot as plt
 
 def dct_image_denoising(noisy_im, D_DCT, epsilon):
     # DCT_IMAGE_DENOISING Denoise an image via the DCT transform
@@ -19,7 +18,7 @@ def dct_image_denoising(noisy_im, D_DCT, epsilon):
     #
     
     # Get the patch size [height, width] from D_DCT
-    patch_size = (10,10)
+    patch_size = (6,6)
 
 
  
@@ -30,14 +29,6 @@ def dct_image_denoising(noisy_im, D_DCT, epsilon):
     # Thresholding pursuit
     [est_patches, est_coeffs] = batch_thresholding(D_DCT, patches, epsilon)
 
-    # out of interest
-    atoms_sums = np.sum(abs(est_coeffs), axis=1)
-    atoms_sums = atoms_sums.reshape([10, -1])
-    atoms_sums = atoms_sums.T
-
-    plt.figure(4)
-    plt.imshow(np.log10(atoms_sums), cmap='hot', interpolation='nearest')
-    plt.savefig("imgs/dct_heatmap.png")
 
  
     # Step 2: Reconstruct the image using 'col_to_im' function

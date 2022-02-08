@@ -7,6 +7,9 @@ from show_dictionary import show_dictionary
 from dct_image_denoising import dct_image_denoising
 from unitary_image_denoising import unitary_image_denoising
 
+import os
+os.makedirs('imgs',exist_ok=True)
+
 #%% Part A: Data construction
  
 # Read an image
@@ -16,7 +19,6 @@ orig_im = orig_im[:256, 251:251+256]
 
 # Set the seed for the random generator
 seed = 42
-
 
  
 # Set a fixed random seed to reproduce the results
@@ -62,13 +64,13 @@ plt.figure(1,figsize=[8,4])
 plt.subplot(1, 2, 1)
 show_dictionary(D_DCT)
 plt.title('Unitary DCT Dictionary') 
+
  
 #%% Part B-1: Unitary DCT denoising
  
 # Set the noise-level of a PATCH for the pursuit,
 # multiplied by some constant (e.g. sqrt(1.1)) to improve the restoration
 epsilon_dct = sigma * patch_size[0] * 1.1**0.5
-
 
  
 # Denoise the input image via the DCT transform
@@ -106,7 +108,8 @@ est_learning, D_learned, mean_error, mean_cardinality = unitary_image_denoising(
 plt.figure(1)
 plt.subplot(1,2,2)
 show_dictionary(D_learned) 
-plt.title('Learned Unitary Dictioanry')
+plt.title('Learned Unitary Dictionary')
+plt.savefig("imgs/fig1_dicts.png", dpi=300)
  
 #% Show the representation error and the cardinality as a function of the
 #% learning iterations
@@ -120,10 +123,29 @@ plt.subplot(1,2,2)
 plt.plot(np.arange(T),mean_cardinality, linewidth=2.0)
 plt.ylabel('Average Number of Non-Zeros')
 plt.xlabel('Learning Iteration')
+plt.savefig("imgs/fig2_learning_dict.png", dpi=300)
  
 #% Compute and print the PSNR
 psnr_unitary = compute_psnr(orig_im, est_learning)
 print('Unitary dictionary: PSNR %.3f\n\n\n' % psnr_unitary)
+
+
+
+# # PSNR vs iterations
+# psnr_lst = []
+# for t in range(T):
+#     t_learning, _, _, _ = unitary_image_denoising(noisy_im, D_DCT, t, epsilon_learning)
+
+#     psnr_t = compute_psnr(orig_im, t_learning)
+#     psnr_lst.append(psnr_t)
+
+# plt.figure(5)
+# plt.plot(np.arange(T), psnr_lst, linewidth=2.0)
+# plt.grid(True)
+# plt.ylabel('PSNR')
+# plt.xlabel('Learning Iteration')
+# plt.savefig("imgs/fig5_psnr_learning.png", dpi=300)
+
  
 #% Show the results
 plt.figure(0)
@@ -131,6 +153,7 @@ plt.subplot(2,2,4)
 plt.imshow(est_learning,'gray')
 plt.axis('off')
 plt.title('Unitary: $\epsilon$ = %.3f PSNR = %.3f' % (epsilon_learning, psnr_unitary))
+plt.savefig("imgs/fig0_barbaras.png", dpi=300)
  
 #%% SOS Boosting
  
@@ -172,3 +195,25 @@ est_learning_sos = est_learning_sos - rho*est_learning
 psnr_unitary_sos = compute_psnr(orig_im, est_learning_sos)
 print('SOS Boosting: epsilon %.3f, rho %.2f, PSNR %.3f\n\n\n' % \
       (epsilon_sos,rho,psnr_unitary_sos))
+
+
+plt.figure(7)
+plt.subplot(1,2,1)
+plt.imshow(est_learning,'gray')
+plt.axis('off')
+plt.title('Unitary: $\epsilon$ = %.3f PSNR = %.3f' % (epsilon_learning, psnr_unitary))
+plt.subplot(1,2,2)
+plt.imshow(est_learning_sos,'gray')
+plt.axis('off')
+plt.title('Unitary SOS: $\epsilon$ = %.3f PSNR = %.3f' % (epsilon_sos, psnr_unitary_sos))
+plt.savefig("imgs/fig7_sos_restored.png", dpi=300)
+
+
+plt.figure(8)
+plt.title("Differences between the Learned and SOS boosted restoration")
+plt.imshow(256-abs(est_learning - est_learning_sos),'gray')
+plt.axis('off')
+plt.savefig("imgs/fig8_differences.png", dpi=300)
+
+
+plt.show()

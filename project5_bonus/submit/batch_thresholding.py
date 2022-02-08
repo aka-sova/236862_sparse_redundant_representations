@@ -1,7 +1,6 @@
 import numpy as np
 import numpy.matlib
 
-
 def batch_thresholding(D, Y, epsilon):
     # BATCH_THRESHOLDING Solve the pursuit problem via the error-constraint 
     # Thresholding pursuit
@@ -56,6 +55,8 @@ def batch_thresholding(D, Y, epsilon):
  
     # Allocate a matrix of size n X N to save the sparse vectors
     A = np.zeros([n,N])
+    
+
 
  
     # In what follows we compute the location of each non-zero to be assigned 
@@ -74,6 +75,8 @@ def batch_thresholding(D, Y, epsilon):
     # Assign to 'A' the coefficients in 'inner_products' using
     # the precomputed 'mat_inds_to_keep' and 'col_sub_to_keep'
     A[mat_inds_to_keep,col_sub_to_keep] = inner_products[mat_inds_to_keep,col_sub_to_keep]
+   
+    
     
     # Reconstruct the patches using 'A' matrix
     X = D @ A 
@@ -83,5 +86,6 @@ def batch_thresholding(D, Y, epsilon):
     
     return X,A
  
+
 
 

@@ -4,6 +4,7 @@ from col2im import col2im
 from batch_thresholding import batch_thresholding
 from compute_stat import compute_stat
 from unitary_dictionary_learning import unitary_dictionary_learning
+import matplotlib.pyplot as plt
 
 def unitary_image_denoising(noisy_im, D_init, num_learning_iterations,epsilon):
     # UNITARY_IMAGE_DENOISING Denoise an image using unitary dictionary learning
@@ -49,6 +50,14 @@ def unitary_image_denoising(noisy_im, D_init, num_learning_iterations,epsilon):
     # Thresholding pursuit
     est_patches, est_coeffs = batch_thresholding(D_unitary, patches, epsilon)
 
+    # out of interest
+    atoms_sums = np.sum(abs(est_coeffs), axis=1)
+    atoms_sums = atoms_sums.reshape([10, -1])
+    atoms_sums = atoms_sums.T
+
+    plt.figure(4)
+    plt.imshow(np.log10(atoms_sums), cmap='hot', interpolation='nearest')
+    plt.savefig("imgs/dct_learned_heatmap.png")
 
 
     # TODO: Step 2: Reconstruct the image using 'col_to_im' function
